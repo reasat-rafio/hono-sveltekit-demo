@@ -2,11 +2,13 @@ import { todos } from "$lib/todos";
 import { Hono } from "hono";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
+import { BadRequest } from "../exceptions";
 
 export const todo = new Hono()
-  .get("/", (c) => {
+  .get("/", async (c) => {
     return c.json({ todos });
   })
+
   .post(
     "/",
     zValidator(

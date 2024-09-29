@@ -16,7 +16,21 @@
 
   const query = createQuery({
     queryKey: ["todos"],
-    queryFn: async () => (await api.todo.$get()).json(),
+    queryFn: async () => {
+      try {
+        const response = await api.todo.$get();
+        if (!response.ok) {
+          const errorData = await response.text();
+          throw new Error(errorData);
+        }
+        return response.json();
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
+        throw new Error();
+      }
+    },
   });
 
   const form = superForm(data.form, {
@@ -27,8 +41,6 @@
       }
     },
   });
-
-  $: console.log($query.data);
 
   const { form: formData, enhance, delayed } = form;
 </script>
@@ -41,7 +53,7 @@
       </div>
     {/each}
   {:else if $query.isError}
-    <div>Error: {$query.error.message}</div>
+    <div>Error: {JSON.stringify($query.error.message)}</div>
   {:else if $query.isSuccess && !!$query.data?.todos?.length}
     {#each $query?.data?.todos as { task }}
       <div>{task}</div>

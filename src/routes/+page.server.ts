@@ -6,7 +6,7 @@ import { zod } from "sveltekit-superforms/adapters";
 import { hc } from "hono/client";
 import type { AppType } from "$lib/api/index.js";
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ fetch }) => {
   return {
     form: await superValidate(zod(formSchema)),
   };
