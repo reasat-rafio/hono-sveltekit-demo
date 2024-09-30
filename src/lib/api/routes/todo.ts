@@ -26,6 +26,24 @@ export const todo = new Hono()
       return c.json({ todos });
     }
   )
+  .delete(
+    "/:id",
+    zValidator(
+      "param",
+      z.object({
+        id: z.string(),
+      })
+    ),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const index = todos.findIndex((todo) => todo.id === Number(id));
+      if (index !== -1) {
+        todos.splice(index, 1);
+      }
+
+      return c.json({ todos });
+    }
+  )
   .get("/:id", (c) => {
     return c.json({
       params: c.req.param("id"),
